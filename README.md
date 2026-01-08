@@ -1,27 +1,29 @@
-# How to update the table summary value when the cell in edit mode in WinForms DataGrid (SfDataGrid) ?
+# How to Update the Table Summary Value When the Cell in Edit Mode in WinForms DataGrid?
 
-How to update the table summary value when the cell in edit mode in WinForms DataGrid (SfDataGrid) ?
+This sample illustrates how to update the table summary value when the cell in edit mode in [WinForms DataGrid](https://www.syncfusion.com/winforms-ui-controls/datagrid) (SfDataGrid).
 
-# About the sample
+In `DataGrid`, you can update the summary values when you are changing the value by overriding `OnInitializeEditElement` method and ``UiElement.TextChanged`` event in [GridNumericCellRenderer](https://help.syncfusion.com/cr/windowsforms/Syncfusion.WinForms.DataGrid.Renderers.GridNumericCellRenderer.html).
 
-In SfDataGrid, you can update the summary values when you are changing the value by overriding OnInitializeEditElement method and UiElement.TextChanged event in GridNumericCellRenderer.
-
+#### C#
 ```c#
 this.sfDataGrid.CellRenderers.Remove("Numeric");
 this.sfDataGrid.CellRenderers.Add("Numeric", new GridNumericCellRendererExt(this.sfDataGrid));
+
 public class GridNumericCellRendererExt : GridNumericCellRenderer
 {
     RowColumnIndex RowColumnIndex { get; set; }
+
     SfDataGrid DataGrid { get; set; }
+
     public GridNumericCellRendererExt(SfDataGrid dataGrid)
     {
         this.DataGrid = dataGrid;
     }
+
     protected override void OnInitializeEditElement(DataColumnBase column, RowColumnIndex rowColumnIndex, SfNumericTextBox uiElement)
     {
         base.OnInitializeEditElement(column, rowColumnIndex, uiElement);
         uiElement.TextChanged += UiElement_TextChanged;
-
         this.RowColumnIndex = rowColumnIndex;
     }
 
@@ -34,17 +36,23 @@ public class GridNumericCellRendererExt : GridNumericCellRenderer
     {
         string editEelementText = string.IsNullOrEmpty(this.CurrentCellRendererElement.Text) ? "0" : this.CurrentCellRendererElement.Text;
         columnIndex = this.TableControl.ResolveToGridVisibleColumnIndex(columnIndex);
+
         if (columnIndex < 0)
             return;
+
         var mappingName = DataGrid.Columns[columnIndex].MappingName;
         var recordIndex = this.TableControl.ResolveToRecordIndex(rowIndex);
+
         if (recordIndex < 0)
             return;
+
         if (DataGrid.View.TopLevelGroup != null)
         {
             var record = DataGrid.View.TopLevelGroup.DisplayElements[recordIndex];
+
             if (!record.IsRecords)
                 return;
+
             var data = (record as RecordEntry).Data;              
             data.GetType().GetProperty(mappingName).SetValue(data, (int.Parse(editEelementText)));
         }
@@ -56,5 +64,8 @@ public class GridNumericCellRendererExt : GridNumericCellRenderer
     }
 }
 ```
+
+![DataGrid displays the updated table summary upon cell editing](TableSummaryUpdate.gif)
+
 ## Requirements to run the demo
  Visual Studio 2015 and above versions
